@@ -1,0 +1,9 @@
+[Unit]
+Description=AutoStop
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/autostop.sh
+
+[Install]
+WantedBy=multi-user.target
