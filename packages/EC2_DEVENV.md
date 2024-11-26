@@ -92,40 +92,64 @@ EOF'
 ```
 
 ```bash
+# Change Permission and Enable Service
 sudo chmod +x /usr/local/bin/autostop.sh
 sudo systemctl enable autostop.service
 sudo systemctl start autostop.service
+
+# Check Status
 sudo systemctl status autostop.service
 ```
 
 ### Install NeoVim and LazyVim
 
 ```bash
+# Go to Home Directory and Clone NeoVim
 cd && git clone https://github.com/neovim/neovim
+
+# Go to NeoVim Directory and Build
 cd neovim && make CMAKE_BUILD_TYPE=RelWithDebInfo
+
+# Install NeoVim
 sudo make install
+
+# Clean Up
 cd && sudo rm -rf neovim
 
+# Install LazyVim
 git clone https://github.com/LazyVim/starter ~/.config/nvim
+
+# Remove Git Directory and Open NeoVim to Install LazyVim
 rm -rf ~/.config/nvim/.git && nvim
-```
-
-### Install Rust and Node.js using fnm
-
-```bash
-curl --proto '=https' --tlsv1.2 -sSf <https://sh.rustup.rs> | sh
-curl -fsSL <https://fnm.vercel.app/install> | bash
-fnm use --install-if-missing 22
 ```
 
 ### Install JDK (Corretto 21)
 
 ```bash
-wget -O - <https://apt.corretto.aws/corretto.key> | sudo gpg --dearmor -o /usr/share/keyrings/corretto-keyring.gpg && \\necho "deb [signed-by=/usr/share/keyrings/corretto-keyring.gpg] <https://apt.corretto.aws> stable main" | sudo tee /etc/apt/sources.list.d/corretto.list
-sudo apt-get update; sudo apt-get install -y java-21-amazon-corretto-jdk
+# To use the Corretto Apt repositories on Debian-based systems, such as Ubuntu, import the Corretto public key and then add the repository to the system list by using the following commands:
+wget -O - https://apt.corretto.aws/corretto.key | sudo gpg --dearmor -o /usr/share/keyrings/corretto-keyring.gpg && \
+echo "deb [signed-by=/usr/share/keyrings/corretto-keyring.gpg] https://apt.corretto.aws stable main" | sudo tee /etc/apt/sources.list.d/corretto.list
+
+# After the repo has been added, you can install Corretto 23 by running this command:
+sudo apt-get update; sudo apt-get install -y java-23-amazon-corretto-jdk
 ```
 
-### Install Other Tools
+### Install Rust and Node.js using nvm
+
+```bash
+# Install Rust and Node.js
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
+
+# Reload Shell
+source $HOME/.cargo/env
+source ~/.zshrc
+
+# Install Node.js
+nvm install 22
+```
+
+### Install General Packages
 
 ```bash
 sudo apt install -y clangd python3.12-full python3-pip php php-cli ruby fish luarocks fd-find golang xsel fzf maven gradle tree
@@ -142,65 +166,94 @@ mkdir ~/.local/share/nvim/mason/packages/clangd
 Install lazygit
 
 ```bash
-LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]\*')
-cd && curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit*${LAZYGIT_VERSION}\_Linux_arm64.tar.gz"
+# Download and Install LazyGit
+LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
+# Change the following URL if you are in different architecture.
+curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_arm64.tar.gz"
 tar xf lazygit.tar.gz lazygit
-sudo install lazygit /usr/local/bin
+sudo install lazygit -D -t /usr/local/bin/
+
+# Clean Up
 rm -rf lazygit*
 ```
 
-Install providers and plugins etc.
+Install NeoVim providers and plugins etc.
 
 ```bash
-npm install -g neovim
+# Install NeoVim Providers
 pip3 install neovim --break-system-packages
+npm install -g neovim
 
+# Install NeoVim Plugins
+pip3 install sqlfluff --break-system-packages
+pip3 install tiktoken --break-system-packages
 npm install -g tree-sitter-cli
 npm install -g markdown-toc
 npm install -g markdownlint-cli2
 npm install -g prettier
-pip3 install sqlfluff --break-system-packages
-pip3 install tiktoken --break-system-packages
 cargo install ripgrep
 ```
 
 Install PHP Composer
 
 ```bash
-php -r "copy('<https://getcomposer.org/installer>', 'composer-setup.php');"
+# Download and Install Composer
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 php -r "if (hash_file('sha384', 'composer-setup.php') === 'dac665fdc30fdd8ec78b38b9800061b4150413ff2e3b6f88543c636f7cd84f6db9189d43a81e5503cda447da73c7e5b6') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
 php composer-setup.php
 php -r "unlink('composer-setup.php');"
+
+# Move Composer to bin directory
 sudo mv composer.phar /usr/local/bin/composer
 ```
 
 ### Install Docker
 
 ```bash
-sudo apt-get install ca-certificates curl -y
+# Set up Docker's apt repository.
+# Add Docker's official GPG key:
+sudo apt-get update
+sudo apt-get install ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL <https://download.docker.com/linux/ubuntu/gpg> -o /etc/apt/keyrings/docker.asc
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
 sudo chmod a+r /etc/apt/keyrings/docker.asc
-echo \\n "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \\n $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \\n sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update; sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+# Install Docker
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 ```
 
 ### Reboot
 
 ```bash
+# To apply all changes, reboot the system.
 sudo reboot
 ```
 
 ### Git Configuration
 
 ```bash
-ssh-keygen -t ed25519 -C "<kernel@yonsei.ac.kr>"
+# Change default branch name to main
+git config --global init.defaultBranch main
+
+# Change Editor to NeoVim
+git config --global core.editor "nvim"
+# Test Editor
+git config --global --edit
+
+# Create SSH Key
+ssh-keygen -t ed25519 -C "{email}"
+
+# Add SSH Key to SSH Agent
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_ed25519
-cat ~/.ssh/id_ed25519.pub
-```
 
-```bash
-git config --global core.editor "nvim"
-git config --global --edit
+# Copy SSH Key And Add to [GitHub](https://github.com/settings/keys)
+cat ~/.ssh/id_ed25519.pub
 ```
