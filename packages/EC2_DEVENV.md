@@ -242,6 +242,10 @@ sudo reboot
 # Change default branch name to main
 git config --global init.defaultBranch main
 
+# Set User Name and Email
+git config --global user.name "{name}"
+git config --global user.email "{email}"
+
 # Change Editor to NeoVim
 git config --global core.editor "nvim"
 # Test Editor
