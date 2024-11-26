@@ -2,7 +2,9 @@
 
 ## Description
 
-This service stops the instance to prevent unexpected charges. The instance will be stopped if it is running and has been running for more than 10 minutes.
+This service stops the instance to prevent unexpected charges.
+
+The instance will be stopped if it is running without any ssh connection more than 10 minutes.
 
 ## Installation
 
