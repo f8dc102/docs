@@ -27,11 +27,15 @@ system_info:
     shell: /bin/zsh
 
 runcmd:
+  # Install OhMyZsh
   - chsh -s $(which zsh) f8dc193
   - su - f8dc193 -c 'sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
-  - su - f8dc193 -c 'git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k'
-  - su - f8dc193 -c "sed -i 's/ZSH_THEME=\"robbyrussell\"/ZSH_THEME=\"powerlevel10k\/powerlevel10k\"/' ~/.zshrc"
+  # Install Powerlevel10k
+  - su - f8dc193 -c "git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k && sed -i 's/ZSH_THEME=\"robbyrussell\"/ZSH_THEME=\"powerlevel10k\/powerlevel10k\"/' ~/.zshrc"
+  # Install Zsh Syntax Highlighting
   - su - f8dc193 -c "git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting && sed -i '/plugins=(git)/c\plugins=(git zsh-syntax-highlighting)' ~/.zshrc"
+  # Finally Reboot the System
+  - reboot
 ```
 
 ### Add Auto-Stop Service
